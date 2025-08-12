@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Earth Engine API</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Earth Engine API Interface</h1>
+    <form id="dataForm">
+        <label>AOI GeoJSON:</label><br>
+        <textarea id="aoi" rows="10" cols="50" placeholder='Paste GeoJSON here'></textarea><br><br>
+
+        <label>Start Date:</label>
+        <input type="date" id="start_date"><br><br>
+
+        <label>End Date:</label>
+        <input type="date" id="end_date"><br><br>
+
+        <label>Datasets (comma-separated):</label><br>
+        <input type="text" id="datasets" placeholder="e.g. MODIS, Landsat"><br><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>Response:</h2>
+    <pre id="response"></pre>
+
+    <script>
+        document.getElementById("dataForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const aoi = JSON.parse(document.getElementById("aoi").value);
+            const start_date = document.getElementById("start_date").value;
+            const end_date = document.getElementById("end_date").value;
+            const datasets = document.getElementById("datasets").value.split(",").map(ds => ds.trim());
+
+            const payload = {
+                aoi: aoi,
+                start_date: start_date,
+                end_date: end_date,
+                datasets: datasets
+            };
+
+            const res = await fetch("/process/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await res.json();
+            document.getElementById("response").textContent = JSON.stringify(result, null, 2);
+        });
+    </script>
+</body>
+</html>
+
